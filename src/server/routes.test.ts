@@ -145,7 +145,12 @@ describe("static assets", () => {
     const htmlText = await html.text();
     expect(htmlText).toContain("<!doctype html>");
     expect(htmlText).toContain('href="./app.css"');
+    expect(htmlText).toContain('href="./favicon.svg"');
     expect((await h.call("/index.html")).status).toBe(200);
+    const icon = await h.call("/favicon.svg");
+    expect(icon.status).toBe(200);
+    expect(icon.headers.get("content-type")).toContain("image/svg+xml");
+    expect(await icon.text()).toContain("<svg");
     const css = await h.call("/app.css");
     expect(css.headers.get("content-type")).toContain("text/css");
     expect(await css.text()).not.toBe("");

@@ -134,6 +134,7 @@ try {
   await expectStatus("public /", "/", 200);
   await expectStatus("public /app.js", "/app.js", 200);
   await expectStatus("public /app.css", "/app.css", 200);
+  await expectStatus("public /favicon.svg", "/favicon.svg", 200);
 
   // Auth gate: unauthenticated API is rejected, the configured token is accepted.
   await expectStatus("unauthenticated /api/auth", "/api/auth", 401);

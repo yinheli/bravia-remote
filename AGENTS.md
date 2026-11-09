@@ -68,7 +68,7 @@ src/
     app.ts         route table + static assets + 404
     requests.ts    typed request-body parsers
     routes/        status, auth, pair, key, apps, screen handlers
-    assets.ts      embedded index.html / app.css / app.js (text imports)
+    assets.ts      embedded index.html / app.css / app.js / favicon.svg (text imports)
   web/
     app.tsx        browser entry
     app.css        Tailwind entry: theme tokens + base page styles
