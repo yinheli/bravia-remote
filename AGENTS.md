@@ -33,7 +33,8 @@ bun run smoke            # compiled-binary shell/auth/API check, unreachable TV
 
 - `bun run test` builds the generated web bundle through `pretest`. If invoking `bun test`
   directly on a fresh clone, run `bun run build:web` first.
-- CI uses Bun 1.4.4 and `bun install --frozen-lockfile`.
+- CI uses Bun 1.4.4 and `bun install --frozen-lockfile`, on a pinned
+  `ubuntu-26.04` runner (`ubuntu-latest` migrated to 26.04 in Nov 2026).
 - `build:web` writes `public/app.js` and the Tailwind bundle `public/app.css`; `build:server`
   compiles the current platform. `build:npm` bundles the server (assets embedded) into
   `dist/server.js` for the published package.
