@@ -1,0 +1,72 @@
+{
+  "name": "@yinheli/bravia-remote",
+  "version": "0.1.1",
+  "description": "Web-based remote control for Sony Bravia TVs. Single-binary Bun server with PIN/PSK pairing, IRCC keys, TV info panel and optional network-adb screenshots.",
+  "license": "MIT",
+  "author": "yinheli",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yinheli/bravia-remote.git"
+  },
+  "homepage": "https://github.com/yinheli/bravia-remote#readme",
+  "bugs": {
+    "url": "https://github.com/yinheli/bravia-remote/issues"
+  },
+  "keywords": [
+    "bravia",
+    "sony",
+    "remote-control",
+    "ircc",
+    "bun",
+    "react"
+  ],
+  "type": "module",
+  "bin": {
+    "bravia-remote": "bin/bravia-remote.mjs"
+  },
+  "files": [
+    "bin/bravia-remote.mjs",
+    "bin/launcher.mjs",
+    "dist/server.js",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "bun run build:web && bun --watch src/server/main.ts",
+    "start": "bun run build:web && bun src/server/main.ts",
+    "build": "bun run build:server",
+    "build:web": "bun scripts/build-web.ts",
+    "build:server": "bun run build:web && bun build --compile src/server/main.ts --outfile dist/bravia-remote",
+    "build:npm": "bun run build:web && bun build --target=bun --outfile dist/server.js src/server/main.ts",
+    "prepack": "bun run build:npm",
+    "smoke": "bun scripts/smoke.ts",
+    "pretest": "bun run build:web",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check": "biome check .",
+    "check:fix": "biome check --write ."
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.6",
+    "@types/bun": "^1.4.4",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "bun-plugin-tailwind": "^0.1.2",
+    "eslint": "^9",
+    "eslint-plugin-react-hooks": "^5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "4.1.14",
+    "typescript": "^5",
+    "typescript-eslint": "^8"
+  }
+}

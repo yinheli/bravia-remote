@@ -1,0 +1,111 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+      - run: bun install --frozen-lockfile
+      - run: bun run typecheck
+      - run: bun run lint
+      - run: bun run check
+      - run: bun run test
+      - name: Verify tag matches package version
+        run: |
+          version="$(bun pm pkg get version | tr -d '"')"
+          test "v${version}" = "$GITHUB_REF_NAME"
+
+  build:
+    needs: check
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Bun cross-compiles every target from a single Linux runner.
+        target:
+          - bun-linux-x64
+          - bun-linux-arm64
+          - bun-linux-x64-musl
+          - bun-darwin-x64
+          - bun-darwin-arm64
+          - bun-windows-x64
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+      - run: bun install --frozen-lockfile
+      - run: bun run build:web
+      - name: Compile single-file executable
+        run: |
+          name="${TARGET#bun-}"
+          bun build --compile --target="$TARGET" src/server/main.ts --outfile "dist/bravia-remote-${name}"
+        env:
+          TARGET: ${{ matrix.target }}
+      # Only the linux-x64 binary can execute on this runner. The other targets
+      # are cross-compiled here and can only be smoke-tested on their platform.
+      - name: Smoke the native Linux artifact
+        if: matrix.target == 'bun-linux-x64'
+        run: bun run smoke dist/bravia-remote-linux-x64
+      - uses: actions/upload-artifact@v7
+        with:
+          name: bravia-remote-${{ matrix.target }}
+          path: dist/bravia-remote-*
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          merge-multiple: true
+          path: dist
+      - name: Add licenses and checksums
+        run: |
+          cp LICENSE THIRD_PARTY_NOTICES.md BUN-LICENSE.md dist/
+          cd dist
+          sha256sum bravia-remote-* > SHA256SUMS
+      - name: Create GitHub release with binaries
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            dist/bravia-remote-* dist/LICENSE dist/THIRD_PARTY_NOTICES.md \
+            dist/BUN-LICENSE.md dist/SHA256SUMS \
+            --generate-notes --title "$GITHUB_REF_NAME"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+  publish:
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - run: bun install --frozen-lockfile
+      # prepack builds dist/server.js and the web assets embedded in it.
+      # Trusted publishing: npm exchanges the GitHub OIDC token automatically;
+      # no NPM_TOKEN secret. The npm CLI (>= 11.5.1) comes with Node 24.
+      - run: npm publish --access public

@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: system-ui, -apple-system, "PingFang SC", "Noto Sans SC", sans-serif;
+
+  --color-ink: #e8eaf0;
+  --color-ink-dim: #c3c9d8;
+  --color-muted: #8a92a6;
+  --color-faint: #727a8e;
+  --color-line: #2c3344;
+  --color-line-strong: #3a4152;
+  --color-panel: #12151d;
+  --color-panel-2: #171a22;
+  --color-field: #0e1118;
+  --color-line-subtle: #232836;
+  --color-ink-soft: #aab2c5;
+  --color-caption: #9aa3b8;
+  --color-status-active: #3fb96c;
+  --color-status-standby: #e0a63a;
+  --color-status-off: #4a5163;
+  --color-key-hi: #333a49;
+  --color-key-lo: #20242e;
+  --color-key-ink: #d5dbe8;
+  --color-key-ink-dim: #cfd6e4;
+  --color-info-surface: #1d2433;
+  --color-info-line: #2e3a55;
+  --color-info-ink: #dfe6f5;
+  --color-danger-surface: #2a1418;
+  --color-danger-line: #6b2b33;
+  --color-success-line: #2e5c43;
+  --color-hint: #9fd6ff;
+  --color-accent: #5b8cff;
+  --color-success: #7fd6a2;
+  --color-danger: #ff9aa0;
+}
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    color: var(--color-ink);
+    touch-action: manipulation;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.4;
+    background: radial-gradient(1200px 700px at 50% -10%, #171b25, #0b0d12);
+  }
+
+  #root {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 14px 14px calc(24px + env(safe-area-inset-bottom));
+  }
+}
